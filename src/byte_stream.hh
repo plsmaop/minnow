@@ -1,6 +1,5 @@
 #pragma once
 
-#include <queue>
 #include <stdexcept>
 #include <string>
 #include <string_view>
@@ -11,8 +10,13 @@ class Writer;
 class ByteStream
 {
 protected:
-  uint64_t capacity_;
+  uint64_t capacity_ = 0;
   // Please add any additional state to the ByteStream here, and not to the Writer and Reader interfaces.
+  uint64_t pushed_ = 0;
+  uint64_t poped_ = 0;
+  bool error_ = false;
+  bool closed_ = false;
+  std::string buf_ = std::string( capacity_, ' ' );
 
 public:
   explicit ByteStream( uint64_t capacity );
@@ -27,7 +31,7 @@ public:
 class Writer : public ByteStream
 {
 public:
-  void push( std::string data ); // Push data to stream, but only as much as available capacity allows.
+  void push( std::string_view data ); // Push data to stream, but only as much as available capacity allows.
 
   void close();     // Signal that the stream has reached its ending. Nothing more will be written.
   void set_error(); // Signal that the stream suffered an error.
